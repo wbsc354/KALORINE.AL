@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NutriCal AI - Smart Calorie & Macro Counter</title>
+  <meta name="description" content="Aplikasi Penghitung Kalori & Nutrisi Makanan Pintar dengan Kalkulator BMR/TDEE, Database Makanan Indonesia, Simulasi AI Food Scanner, dan Grafik Progres Harian.">
+  
+  <!-- RemixIcon & Google Fonts -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Sidebar Navigation (Desktop) -->
+    <aside class="sidebar">
+      <div>
+        <div class="brand-logo">
+          <div class="brand-icon">
+            <i class="ri-fire-fill" style="font-size: 1.5rem;"></i>
+          </div>
+          <div>
+            <span class="brand-text">NutriCal<span style="color: var(--accent-emerald);">AI</span></span>
+          </div>
+        </div>
+
+        <ul class="nav-menu">
+          <li class="nav-item active" data-tab="dashboard">
+            <i class="ri-dashboard-3-line"></i>
+            <span>Dashboard Harian</span>
+          </li>
+          <li class="nav-item" data-tab="database">
+            <i class="ri-search-eye-line"></i>
+            <span>Database Makanan</span>
+          </li>
+          <li class="nav-item" data-tab="scanner">
+            <i class="ri-qr-scan-2-line"></i>
+            <span>AI Food Scanner</span>
+          </li>
+          <li class="nav-item" data-tab="history">
+            <i class="ri-bar-chart-box-line"></i>
+            <span>Histori & Laporan</span>
+          </li>
+          <li class="nav-item" data-tab="profile">
+            <i class="ri-user-settings-line"></i>
+            <span>Profil & BMR/TDEE</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="user-quick-profile">
+        <div class="avatar">
+          <i class="ri-user-3-line"></i>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="header-user-name">Pengguna NutriCal</div>
+          <div class="user-target" id="header-user-target">Target: 2000 kcal</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- Top Bar -->
+      <header class="top-bar">
+        <div class="page-header">
+          <h1 id="page-heading-title">Tracker Kalori & Nutrisi</h1>
+          <p id="page-heading-subtitle">Pantau asupan kalori dan distribusi makronutrisi harian Anda</p>
+        </div>
+
+        <div class="top-controls">
+          <div class="date-picker-badge">
+            <i class="ri-calendar-event-line" style="color: var(--accent-emerald);"></i>
+            <input type="date" id="log-date-picker" />
+          </div>
+
+          <button class="theme-toggle-btn" id="theme-toggle-btn" title="Ganti Mode Tampilan (Dark/Light)">
+            <i class="ri-sun-line"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- VIEW 1: DASHBOARD HARIAN -->
+      <section class="view-section active" id="view-dashboard">
+        
+        <!-- Summary Cards Grid -->
+        <div class="grid-summary">
+          
+          <!-- Calorie SVG Gauge Card -->
+          <div class="card calorie-gauge-box">
+            <div class="card-title" style="width: 100%;">
+              <span>Sisa Kalori Harian</span>
+              <i class="ri-fire-line" style="color: var(--accent-amber);"></i>
+            </div>
+
+            <div style="position: relative;">
+              <svg class="gauge-svg" viewBox="0 0 200 200">
+                <defs>
+                  <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="var(--accent-emerald)" />
+                    <stop offset="100%" stop-color="var(--accent-teal)" />
+                  </linearGradient>
+                </defs>
+                <circle class="gauge-bg" cx="100" cy="100" r="90" />
+                <circle class="gauge-progress" id="gauge-progress-circle" cx="100" cy="100" r="90" />
+              </svg>
+
+              <div class="gauge-center-text">
+                <div class="gauge-calories-left" id="gauge-calories-left">2000</div>
+                <div class="gauge-subtext" id="gauge-subtext-label">Kcal Tersisa</div>
+              </div>
+            </div>
+
+            <div class="calorie-sub-stats">
+              <div class="stat-pill">
+                <div class="stat-pill-icon eaten"><i class="ri-restaurant-line"></i></div>
+                <div>
+                  <div class="stat-pill-val" id="stat-calories-eaten">0 kcal</div>
+                  <div class="stat-pill-lbl">Dimakan</div>
+                </div>
+              </div>
+              <div class="stat-pill">
+                <div class="stat-pill-icon target"><i class="ri-flag-line"></i></div>
+                <div>
+                  <div class="stat-pill-val" id="stat-calories-target">2000 kcal</div>
+                  <div class="stat-pill-lbl">Target Goal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Macros Progress Grid -->
+          <div style="display: flex; flex-direction: column; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <h3 class="font-heading" style="font-weight: 700;">Distribusi Makronutrisi</h3>
+              <span style="font-size: 0.8rem; color: var(--text-muted);">Progres & Target (Gram)</span>
+            </div>
+
+            <div class="macros-grid">
+              <!-- Karbohidrat -->
+              <div class="macro-card">
+                <div class="macro-header">
+                  <span class="macro-name" style="color: var(--macro-carbs);"><i class="ri-bread-line"></i> Karbohidrat</span>
+                </div>
+                <div class="macro-values" id="macro-val-carbs">0g <span>/ 250g</span></div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill carbs-fill" id="macro-fill-carbs"></div>
+                </div>
+              </div>
+
+              <!-- Protein -->
+              <div class="macro-card">
+                <div class="macro-header">
+                  <span class="macro-name" style="color: var(--macro-protein);"><i class="ri-goblet-line"></i> Protein</span>
+                </div>
+                <div class="macro-values" id="macro-val-protein">0g <span>/ 125g</span></div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill protein-fill" id="macro-fill-protein"></div>
+                </div>
+              </div>
+
+              <!-- Lemak -->
+              <div class="macro-card">
+                <div class="macro-header">
+                  <span class="macro-name" style="color: var(--macro-fat);"><i class="ri-drop-line"></i> Lemak</span>
+                </div>
+                <div class="macro-values" id="macro-val-fat">0g <span>/ 55g</span></div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill fat-fill" id="macro-fill-fat"></div>
+                </div>
+              </div>
+
+              <!-- Serat -->
+              <div class="macro-card">
+                <div class="macro-header">
+                  <span class="macro-name" style="color: var(--macro-fiber);"><i class="ri-plant-line"></i> Serat</span>
+                </div>
+                <div class="macro-values" id="macro-val-fiber">0g <span>/ 28g</span></div>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill fiber-fill" id="macro-fill-fiber"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Action Banner -->
+            <div style="background: linear-gradient(135deg, rgba(16,185,129,0.1), rgba(139,92,246,0.1)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 16px 20px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-weight: 700; font-size: 0.95rem;">Ingin memindai foto makanan dengan AI?</span>
+                <p style="font-size: 0.8rem; color: var(--text-muted);">Foto atau upload gambar makanan untuk deteksi kalori otomatis</p>
+              </div>
+              <button class="btn-primary" onclick="window.appController.switchTab('scanner')">
+                <i class="ri-qr-scan-2-line"></i> Pindai Sekarang
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Meals Tracker Sections -->
+        <div class="meal-tracker-section">
+          
+          <!-- Sarapan Pagi -->
+          <div class="meal-category-card">
+            <div class="meal-category-header">
+              <div class="meal-title-group">
+                <div class="meal-icon sarapan"><i class="ri-sun-cloudy-line"></i></div>
+                <div>
+                  <h3 class="meal-title">Sarapan Pagi</h3>
+                  <div class="meal-calorie-total" id="meal-total-sarapan">Total: <strong>0 kcal</strong></div>
+                </div>
+              </div>
+              <button class="btn-add-food" onclick="window.appController.switchTab('database')">
+                <i class="ri-add-line"></i> Tambah Makanan
+              </button>
+            </div>
+            <div class="food-items-list" id="logged-list-sarapan"></div>
+          </div>
+
+          <!-- Makan Siang -->
+          <div class="meal-category-card">
+            <div class="meal-category-header">
+              <div class="meal-title-group">
+                <div class="meal-icon siang"><i class="ri-sun-line"></i></div>
+                <div>
+                  <h3 class="meal-title">Makan Siang</h3>
+                  <div class="meal-calorie-total" id="meal-total-siang">Total: <strong>0 kcal</strong></div>
+                </div>
+              </div>
+              <button class="btn-add-food" onclick="window.appController.switchTab('database')">
+                <i class="ri-add-line"></i> Tambah Makanan
+              </button>
+            </div>
+            <div class="food-items-list" id="logged-list-siang"></div>
+          </div>
+
+          <!-- Makan Malam -->
+          <div class="meal-category-card">
+            <div class="meal-category-header">
+              <div class="meal-title-group">
+                <div class="meal-icon malam"><i class="ri-moon-clear-line"></i></div>
+                <div>
+                  <h3 class="meal-title">Makan Malam</h3>
+                  <div class="meal-calorie-total" id="meal-total-malam">Total: <strong>0 kcal</strong></div>
+                </div>
+              </div>
+              <button class="btn-add-food" onclick="window.appController.switchTab('database')">
+                <i class="ri-add-line"></i> Tambah Makanan
+              </button>
+            </div>
+            <div class="food-items-list" id="logged-list-malam"></div>
+          </div>
+
+          <!-- Camilan -->
+          <div class="meal-category-card">
+            <div class="meal-category-header">
+              <div class="meal-title-group">
+                <div class="meal-icon camilan"><i class="ri-cup-line"></i></div>
+                <div>
+                  <h3 class="meal-title">Camilan & Minuman</h3>
+                  <div class="meal-calorie-total" id="meal-total-camilan">Total: <strong>0 kcal</strong></div>
+                </div>
+              </div>
+              <button class="btn-add-food" onclick="window.appController.switchTab('database')">
+                <i class="ri-add-line"></i> Tambah Makanan
+              </button>
+            </div>
+            <div class="food-items-list" id="logged-list-camilan"></div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- VIEW 2: DATABASE MAKANAN -->
+      <section class="view-section" id="view-database">
+        <div class="search-filter-bar">
+          <div class="search-input-box">
+            <i class="ri-search-line"></i>
+            <input type="text" id="db-search-input" placeholder="Cari makanan Indonesia (Nasi Goreng, Rendang, Ayam, Tempe, Soto)..." />
+          </div>
+          
+          <select id="db-category-select" class="filter-select">
+            <option value="all">Semua Kategori</option>
+          </select>
+
+          <button class="btn-primary" onclick="window.appController.openCustomFoodModal()">
+            <i class="ri-add-circle-line"></i> Tambah Custom Food
+          </button>
+        </div>
+
+        <div class="food-db-grid" id="food-db-grid-container"></div>
+      </section>
+
+      <!-- VIEW 3: AI FOOD SCANNER -->
+      <section class="view-section" id="view-scanner">
+        <div style="margin-bottom: 24px;">
+          <h2 class="font-heading" style="font-weight: 800; font-size: 1.5rem;">Simulasi AI Computer Vision Scanner</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Unggah foto makanan Anda atau pilih dari galeri sampel untuk mendeteksi kalori & makronutrisi secara instan.</p>
+        </div>
+
+        <div class="ai-scanner-container">
+          <div>
+            <div class="scanner-box" onclick="document.getElementById('ai-file-upload-input').click()">
+              <input type="file" id="ai-file-upload-input" accept="image/*" style="display: none;" onchange="window.aiScanner.handleCustomImageUpload(this.files[0])" />
+              
+              <img id="scanner-preview-img" class="scanner-preview-img" alt="Preview Food" />
+              
+              <div id="scanner-prompt-text" style="text-align: center; padding: 20px;">
+                <i class="ri-camera-lens-line" style="font-size: 3rem; color: var(--accent-emerald);"></i>
+                <h4 style="margin-top: 12px; font-weight: 700;">Klik untuk Unggah Foto Makanan</h4>
+                <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;">Atau pilih dari contoh hidangan di bawah</p>
+              </div>
+
+              <!-- Scanner Overlay Animation -->
+              <div class="scanner-overlay" id="scanner-overlay">
+                <div class="scanner-laser-line"></div>
+                <div class="scanner-bounding-box">
+                  <span class="scanner-bounding-label">NutriCal AI Scanning...</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top: 16px;">
+              <span style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); display: block; margin-bottom: 8px;">Galeri Sampel Makanan AI:</span>
+              <div class="ai-sample-gallery" id="ai-sample-gallery-box"></div>
+            </div>
+          </div>
+
+          <!-- Result Container -->
+          <div id="ai-scan-results"></div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: HISTORI & LAPORAN -->
+      <section class="view-section" id="view-history">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+          <div>
+            <h2 class="font-heading" style="font-weight: 800; font-size: 1.5rem;">Histori & Grafik Progres</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Analisis tren konsumsi kalori 7 hari terakhir dan ekspor data</p>
+          </div>
+          <div style="display: flex; gap: 12px;">
+            <button class="btn-primary" onclick="window.appController.exportCSVReport()">
+              <i class="ri-file-download-line"></i> Ekspor CSV
+            </button>
+            <button class="btn-primary" style="background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));" onclick="window.appController.exportBackupJSON()">
+              <i class="ri-database-2-line"></i> Backup JSON
+            </button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 32px;">
+          <div class="card-title">
+            <span>Grafik Konsumsi Kalori 7 Hari Terakhir</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">Garis Merah = Melampaui Target</span>
+          </div>
+          <div id="history-chart-box"></div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Pulihkan Data dari Backup (Import JSON)</h3>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <input type="file" id="json-import-file-input" accept=".json" class="form-control" style="flex: 1;" />
+            <button class="btn-primary" onclick="window.appController.importBackupJSON(document.getElementById('json-import-file-input').files[0])">
+              <i class="ri-upload-2-line"></i> Pulihkan Data
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: PROFIL & KALKULATOR BMR/TDEE -->
+      <section class="view-section" id="view-profile">
+        <div style="margin-bottom: 24px;">
+          <h2 class="font-heading" style="font-weight: 800; font-size: 1.5rem;">Profil & Kalkulator BMR / TDEE</h2>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Hitung secara akurat Basal Metabolic Rate & Total Kebutuhan Energi Harian berdasarkan rumus ilmiah Mifflin-St Jeor</p>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;" id="bmr-tdee-live-calc"></div>
+
+        <div class="card">
+          <form id="user-profile-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nama Pengguna</label>
+                <input type="text" id="prof-name" class="form-control" placeholder="Masukkan nama Anda" required />
+              </div>
+              <div class="form-group">
+                <label>Jenis Kelamin</label>
+                <select id="prof-gender" class="form-control">
+                  <option value="male">Pria</option>
+                  <option value="female">Wanita</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Usia (Tahun)</label>
+                <input type="number" id="prof-age" class="form-control" min="10" max="100" required />
+              </div>
+              <div class="form-group">
+                <label>Berat Badan (kg)</label>
+                <input type="number" id="prof-weight" class="form-control" step="0.1" min="30" max="300" required />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Tinggi Badan (cm)</label>
+                <input type="number" id="prof-height" class="form-control" min="100" max="250" required />
+              </div>
+              <div class="form-group">
+                <label>Tingkat Aktivitas Harian</label>
+                <select id="prof-activity" class="form-control">
+                  <option value="sedentary">Jarang / Tidak Berolahraga (Kerja Kantoran)</option>
+                  <option value="light">Olahraga Ringan (1-3 hari/minggu)</option>
+                  <option value="moderate">Olahraga Sedang (3-5 hari/minggu)</option>
+                  <option value="active">Olahraga Berat (6-7 hari/minggu)</option>
+                  <option value="extra">Ekstra Aktif / Pekerja Fisik Berat</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Tujuan Kebugaran (Goal)</label>
+              <select id="prof-goal" class="form-control">
+                <option value="maintain">Pertahankan Berat Badan Saat Ini</option>
+                <option value="lose-mild">Menurunkan BB Ringan (-0.25 kg/minggu)</option>
+                <option value="lose">Menurunkan BB Standar (-0.5 kg/minggu)</option>
+                <option value="lose-fast">Menurunkan BB Cepat (-0.75 kg/minggu)</option>
+                <option value="gain-mild">Menaikkan BB Ringan (+0.25 kg/minggu)</option>
+                <option value="gain">Menaikkan BB Standar (+0.5 kg/minggu)</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 10px;">
+              <i class="ri-save-3-line"></i> Simpan Profil & Update Kebutuhan Kalori
+            </button>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-item active" data-tab="dashboard">
+      <i class="ri-dashboard-3-line"></i>
+      <span>Dashboard</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="database">
+      <i class="ri-search-eye-line"></i>
+      <span>Cari</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="scanner">
+      <i class="ri-qr-scan-2-line"></i>
+      <span>Scanner</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="history">
+      <i class="ri-bar-chart-box-line"></i>
+      <span>Histori</span>
+    </div>
+    <div class="mobile-nav-item" data-tab="profile">
+      <i class="ri-user-settings-line"></i>
+      <span>Profil</span>
+    </div>
+  </nav>
+
+  <!-- MODAL 1: ADD PORTION TO MEAL -->
+  <div class="modal-backdrop" id="modal-add-portion">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-food-title">Catat Makanan</h3>
+        <button class="close-modal-btn" onclick="window.appController.closeModals()">&times;</button>
+      </div>
+
+      <div class="form-group">
+        <label>Pilih Waktu Makan</label>
+        <select id="modal-meal-category-select" class="form-control">
+          <option value="sarapan">Sarapan Pagi</option>
+          <option value="siang">Makan Siang</option>
+          <option value="malam">Makan Malam</option>
+          <option value="camilan">Camilan & Minuman</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Berat Porsi (Gram)</label>
+        <input type="number" id="modal-portion-gram" class="form-control" value="100" min="1" max="2000" oninput="window.appController.updatePortionPreview()" />
+      </div>
+
+      <div id="modal-portion-calc-preview" style="background: var(--bg-glass); border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md); margin-bottom: 24px; text-align: center;"></div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-primary" style="background: var(--bg-tertiary); color: var(--text-primary); flex: 1; justify-content: center;" onclick="window.appController.closeModals()">Batal</button>
+        <button class="btn-primary" style="flex: 2; justify-content: center;" onclick="window.appController.confirmAddFoodLog()">Simpan ke Log</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 2: ADD CUSTOM FOOD -->
+  <div class="modal-backdrop" id="modal-custom-food">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title">Tambah Makanan Kustom Baru</h3>
+        <button class="close-modal-btn" onclick="window.appController.closeModals()">&times;</button>
+      </div>
+
+      <form id="custom-food-form">
+        <div class="form-group">
+          <label>Nama Makanan</label>
+          <input type="text" id="cust-food-name" class="form-control" placeholder="Contoh: Tumis Kangkung Terasi" required />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Kategori</label>
+            <input type="text" id="cust-food-cat" class="form-control" placeholder="Makanan Indonesia" required />
+          </div>
+          <div class="form-group">
+            <label>Berat Acuan (Gram)</label>
+            <input type="number" id="cust-food-gram" class="form-control" value="100" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Kalori (kcal)</label>
+            <input type="number" id="cust-food-calories" class="form-control" placeholder="150" required />
+          </div>
+          <div class="form-group">
+            <label>Karbohidrat (g)</label>
+            <input type="number" id="cust-food-carbs" class="form-control" step="0.1" placeholder="20" required />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Protein (g)</label>
+            <input type="number" id="cust-food-protein" class="form-control" step="0.1" placeholder="10" required />
+          </div>
+          <div class="form-group">
+            <label>Lemak (g)</label>
+            <input type="number" id="cust-food-fat" class="form-control" step="0.1" placeholder="5" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Serat (g)</label>
+          <input type="number" id="cust-food-fiber" class="form-control" step="0.1" value="2.0" />
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 10px;">
+          <button type="button" class="btn-primary" style="background: var(--bg-tertiary); color: var(--text-primary); flex: 1; justify-content: center;" onclick="window.appController.closeModals()">Batal</button>
+          <button type="submit" class="btn-primary" style="flex: 2; justify-content: center;">Simpan Makanan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/database.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/ai-scanner.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
